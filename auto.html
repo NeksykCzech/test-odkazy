@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Test: automatický únik při načtení</title>
+<script>
+/* Vloží <meta http-equiv="refresh"> ještě během parsování stránky (document.write), takže se chová
+   jako staticky zapsaná značka. Spustí se jen z Instagramu (instagram://extbrowser) nebo z Threads
+   (barcelona://extbrowser) a jen když v adrese není oib=1 (ochrana proti smyčce). */
+(function(){
+  var ua = navigator.userAgent || '';
+  var params = new URLSearchParams(location.search);
+  var back = location.origin + location.pathname.replace(/auto\.html$/, 'index.html') + '?oib=1&via=meta-static&q=test&x=1#kontrola';
+  var scheme = /\bBarcelona/i.test(ua) ? 'barcelona' : (/\bInstagram/i.test(ua) ? 'instagram' : null);
+  window.__autoResult = { scheme: scheme, blockedByOib: params.get('oib') === '1' };
+  if (scheme && params.get('oib') !== '1') {
+    document.write('<meta http-equiv="refresh" content="0;url=' + scheme + '://extbrowser/?url=' + encodeURIComponent(back) + '">');
+  }
+})();
+</script>
+<style>
+body{margin:0;padding:24px 16px;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#f5f6f8;color:#17202a}
+@media (prefers-color-scheme:dark){body{background:#12161b;color:#e6eaef}}
+main{max-width:640px;margin:0 auto}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow-wrap:anywhere}
+a{color:#0b5fa5}
+</style>
+</head>
+<body>
+<main>
+<h1 style="font-size:22px">Automatický únik při načtení</h1>
+<p id="msg">Načítám…</p>
+<p class="mono" id="ua"></p>
+<p><a href="index.html">Zpět na testovací stránku</a></p>
+</main>
+<script>
+(function(){
+  var r = window.__autoResult || {};
+  var msg = document.getElementById('msg');
+  document.getElementById('ua').textContent = navigator.userAgent;
+  if (r.blockedByOib) { msg.textContent = 'V adrese je oib=1, automatika se nespustila (ochrana proti smyčce).'; return; }
+  if (!r.scheme) { msg.textContent = 'Tahle stránka se má otevřít z Instagramu nebo Threads. Tady nejsme v jejich vestavěném prohlížeči, takže se nic nestalo.'; return; }
+  msg.textContent = 'Meta refresh na ' + r.scheme + '://extbrowser byl zapsán při načítání. Když ještě po pár sekundách vidíš tuhle stránku, Instagram ho zahodil.';
+  setTimeout(function(){ msg.textContent += ' → Po 3 s pořád tady: automatický meta refresh NEZABRAL.'; }, 3000);
+})();
+</script>
+</body>
+</html>

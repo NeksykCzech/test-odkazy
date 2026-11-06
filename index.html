@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Test odkazů GeekBoy</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--fg:#17202a;--muted:#5b6672;--rule:#d9dee5;--accent:#0b5fa5;--ok:#1f7a4d;--ok-bg:#e3f3ea;--warn:#9a5b00;--warn-bg:#fbefd6;--bad:#8a2d2d;--bad-bg:#f7e3e3;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#12161b;--card:#1a2027;--fg:#e6eaef;--muted:#9aa5b1;--rule:#2c343d;--accent:#6fb1ec;--ok:#7bd3a3;--ok-bg:#15311f;--warn:#f0bf6a;--warn-bg:#3a2a0a;--bad:#f0a0a0;--bad-bg:#3d1c1c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+main{max-width:640px;margin:0 auto}
+h1{font-size:22px;margin:8px 0 4px}
+h2{font-size:17px;margin:26px 0 8px}
+p{margin:0 0 10px}
+.sub{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px;margin:12px 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.mono{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:13px;font-weight:600}
+.ok{color:var(--ok);background:var(--ok-bg)} .warn{color:var(--warn);background:var(--warn-bg)} .bad{color:var(--bad);background:var(--bad-bg)}
+.btn{display:block;width:100%;text-align:center;padding:14px 12px;margin:10px 0;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:16px;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit}
+.btn.sec{background:transparent;color:var(--accent)}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin:-6px 0 12px}
+.log{font-family:var(--mono);font-size:12px;white-space:pre-wrap;background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:10px;max-height:260px;overflow:auto}
+textarea{width:100%;min-height:90px;font-family:var(--mono);font-size:12px;border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--bg);color:var(--fg)}
+.banner{border-left:4px solid var(--ok);padding:10px 12px;background:var(--ok-bg);color:var(--ok);border-radius:8px;margin:12px 0;font-weight:600}
+.banner.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+small{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Test odkazů GeekBoy</h1>
+<p class="sub">Interní testovací stránka (6. 11. 2026). Otevři ji z Instagramu, Threads, TikToku nebo YouTube a klepej na tlačítka. Nic se nikam neposílá; výsledek si zkopíruješ tlačítkem dole.</p>
+
+<div id="banner"></div>
+
+<div class="card">
+  <h2 style="margin-top:0">Kde právě jsme</h2>
+  <dl class="kv">
+    <dt>Prostředí</dt><dd id="env"></dd>
+    <dt>Systém</dt><dd id="os"></dd>
+    <dt>Detekce</dt><dd id="det"></dd>
+    <dt>Návrat po úniku</dt><dd id="back"></dd>
+    <dt>Parametry v adrese</dt><dd id="params" class="mono"></dd>
+    <dt>Fragment (#)</dt><dd id="hash" class="mono"></dd>
+    <dt>Referrer</dt><dd id="ref" class="mono"></dd>
+    <dt>User-Agent</dt><dd id="ua" class="mono"></dd>
+  </dl>
+</div>
+
+<h2>1. Únik z vestavěného prohlížeče (klepnutím)</h2>
+<p class="hint">Každé tlačítko je obyčejný odkaz. Po klepnutí sleduj: otevřel se Safari/Chrome? Zeptal se Instagram dialogem? Nestalo se nic? Pak se vrať sem a klepni na další.</p>
+
+<a class="btn" id="b-ig" href="#">Instagram → ven (instagram://extbrowser)</a>
+<p class="hint">Jen z Instagramu. Z Threads nepoužívat (otevře appku Instagram).</p>
+
+<a class="btn" id="b-th" href="#">Threads → ven (barcelona://extbrowser)</a>
+<p class="hint">Jen z Threads.</p>
+
+<a class="btn" id="b-int" href="#">Android → výchozí prohlížeč (intent, bez package)</a>
+<p class="hint">Jen Android. Má náhradní adresu (browser_fallback_url), při selhání se vrátí sem.</p>
+
+<a class="btn" id="b-intc" href="#">Android → vynucený Chrome (intent, package=com.android.chrome)</a>
+
+<a class="btn" id="b-xs" href="#">iPhone → Safari (x-safari-https, odkaz)</a>
+<p class="hint">V Instagramu od března 2026 podle hlášení nefunguje; testujeme, zda pořád. Ve Facebooku/Messengeru/WhatsAppu může fungovat.</p>
+
+<h2>2. Varianty skriptem (po klepnutí)</h2>
+<button class="btn sec" id="j-ig">Skriptem: location.href = instagram://extbrowser</button>
+<button class="btn sec" id="j-xs">Skriptem: window.open(x-safari-https)</button>
+<button class="btn sec" id="j-meta">Skriptem: vložit &lt;meta refresh&gt; na instagram://extbrowser</button>
+<p class="hint">Rozlišení „odkaz“ vs. „skript po klepnutí“ vs. „meta refresh vložený až po načtení“. Kdo chce automatiku při načítání, otevře stránku <a id="l-auto" href="auto.html">auto.html</a> (meta refresh přímo v HTML; jen z Instagramu/Threads).</p>
+
+<h2>3. Ruční cesta</h2>
+<p>V Instagramu: ⋯ vpravo nahoře → <strong>Otevřít v externím prohlížeči</strong>. V TikToku: ⋯ → Otevřít v prohlížeči. Nebo zkopíruj adresu a vlož ji do Safari/Chromu:</p>
+<button class="btn sec" id="copy-url">Kopírovat adresu této stránky</button>
+
+<h2>4. Kontrola Alzy (jen až jsi venku)</h2>
+<p class="hint">Klepni z prohlížeče, kde jsi venku. Sleduj: otevře se aplikace Alza, nebo alza.cz v prohlížeči? Je v adrese <code>idp=8435&amp;banner_id=…</code>? Pro srovnání to zkus i rovnou z Instagramu bez úniku.</p>
+<a class="btn sec" href="https://www.geekboy.cz/X33vp/" rel="noopener">Dnešní krátký odkaz geekboy.cz/X33vp/ (Anker, Alza)</a>
+<a class="btn sec" href="https://www.alza.cz/anker-633-magnetic-wireless-power-bank-10000mah-15w-27w-usb-c-black-d12283346.htm?idp=8435&banner_id=47441" rel="noopener">Přímo Alza s idp (bez přesměrování)</a>
+
+<h2>5. Záznam a výsledek</h2>
+<div class="log" id="log"></div>
+<p class="hint" style="margin-top:8px">Záznam ukazuje čas klepnutí, zda prohlížeč uznal gesto (userActivation) a zda se stránka po klepnutí schovala (visibilitychange/pagehide = něco se otevřelo).</p>
+<button class="btn" id="copy-res">Kopírovat výsledek</button>
+<textarea id="res" readonly aria-label="Výsledek testu"></textarea>
+<p><small>Detekce: inapp-spy 5.0.10 (MIT, Shalanah Dawson) z jsDelivr, s vlastní zálohou podle stejných vzorů. Stránka nic neukládá ani neodesílá.</small></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/inapp-spy@5.0.10/dist/index.global.js"></script>
+<script>
+(function(){
+  var ua = navigator.userAgent || '';
+  var $ = function(id){ return document.getElementById(id); };
+  var logEl = $('log'); var lines = [];
+  function log(msg){ var t = new Date(); var ts = t.toTimeString().slice(0,8) + '.' + String(t.getMilliseconds()).padStart(3,'0'); lines.push(ts + '  ' + msg); logEl.textContent = lines.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+
+  // Záložní detekce podle vzorů inapp-spy (src/regexAppName.ts, MIT)
+  var fallbackApps = [
+    ['messenger', /(\bFB[\w_]+\/(Messenger))|(^(?!.*\buseragents)(?!.*\bIABMV).*(FB_IAB|FBAN).*)/i, 'Facebook Messenger'],
+    ['instagram', /\bInstagram/i, 'Instagram'],
+    ['facebook', /\bFB[\w_]+\/|\bFacebook/i, 'Facebook'],
+    ['twitter', /\bTwitter/i, 'Twitter'],
+    ['line', /\bLine\//i, 'Line'],
+    ['wechat', /\bMicroMessenger\//i, 'WeChat'],
+    ['threads', /\bBarcelona/i, 'Threads'],
+    ['tiktok', /musical_ly|Bytedance/i, 'TikTok'],
+    ['snapchat', /Snapchat/i, 'Snapchat'],
+    ['linkedin', /LinkedInApp/i, 'LinkedIn'],
+    ['gsa', /GSA/i, 'Google Search App'],
+    ['whatsapp', /\b(WAiOS|WA4A)\//i, 'WhatsApp'],
+    ['reddit', /\bReddit\//i, 'Reddit']
+  ];
+  function detect(){
+    if (window.InAppSpy) { try { var r = window.InAppSpy({ ua: ua }); return { isInApp: !!r.isInApp, appKey: r.appKey || null, appName: r.appName || null, src: 'inapp-spy' }; } catch(e) { log('inapp-spy selhal: ' + e); } }
+    for (var i=0;i<fallbackApps.length;i++){ if (fallbackApps[i][1].test(ua)) return { isInApp:true, appKey:fallbackApps[i][0], appName:fallbackApps[i][2], src:'záloha' }; }
+    var generic = /Android.*wv\)/.test(ua) || (/(iPhone|iPod|iPad)/.test(ua) && !/Safari\//.test(ua));
+    return { isInApp: generic, appKey: generic ? 'unknown' : null, appName: generic ? 'neznámý WebView' : null, src: 'záloha' };
+  }
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(ua);
+  var d = detect();
+
+  var params = new URLSearchParams(location.search);
+  var oib = params.get('oib') === '1';
+  var via = params.get('via') || '';
+
+  // Návratová adresa: tato stránka + oib=1 + via + kontrolní parametry + fragment
+  var base = location.origin + location.pathname;
+  function ret(method, withHash){
+    var u = base + '?oib=1&via=' + method + '&q=test&x=1';
+    return withHash ? u + '#kontrola' : u;
+  }
+  function hostPath(u){ return u.replace(/^https?:\/\//, ''); }
+
+  // Vyplnění stavu
+  $('ua').textContent = ua;
+  $('os').textContent = isIOS ? 'iOS / iPadOS' : (isAndroid ? 'Android' : 'počítač nebo jiné');
+  $('det').textContent = (d.isInApp ? ('vestavěný prohlížeč: ' + (d.appName || d.appKey)) : 'běžný prohlížeč') + ' (' + d.src + ')';
+  $('env').innerHTML = d.isInApp ? '<span class="pill warn">Uvnitř aplikace</span>' : '<span class="pill ok">Venku (Safari/Chrome/jiný prohlížeč)</span>';
+  $('back').textContent = oib ? ('ANO, přišli jsme přes: ' + (via || '?')) : 'ne (první načtení)';
+  $('params').textContent = location.search || '(žádné)';
+  $('hash').textContent = location.hash || '(žádný)';
+  $('ref').textContent = document.referrer || '(prázdný)';
+  if (oib) {
+    $('banner').innerHTML = '<div class="banner">Jsme venku. Vrátili jsme se přes „' + via + '“. Parametry ' + (params.get('q') === 'test' && params.get('x') === '1' ? 'dorazily celé' : 'DORAZILY NEÚPLNÉ') + ', fragment ' + (location.hash ? 'dorazil' : 'nedorazil') + '.</div>';
+    if (d.isInApp) $('banner').innerHTML += '<div class="banner warn">Pozor: oib=1, ale detekce říká, že jsme pořád uvnitř aplikace. Buď únik selhal a náhradní adresa nás vrátila sem, nebo detekce chybuje.</div>';
+  }
+
+  // Odkazy
+  var igUrl = 'instagram://extbrowser/?url=' + encodeURIComponent(ret('ig', true));
+  var thUrl = 'barcelona://extbrowser/?url=' + encodeURIComponent(ret('th', true));
+  var intTarget = ret('intent', false); // bez fragmentu: # zahajuje blok Intentu
+  var intUrl = 'intent://' + hostPath(intTarget) + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=' + encodeURIComponent(ret('intent-fallback', true)) + ';end';
+  var intcUrl = 'intent://' + hostPath(ret('intent-chrome', false)) + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(ret('intent-chrome-fallback', true)) + ';end';
+  var xsUrl = 'x-safari-' + ret('xsafari', true);
+  $('b-ig').href = igUrl; $('b-th').href = thUrl; $('b-int').href = intUrl; $('b-intc').href = intcUrl; $('b-xs').href = xsUrl;
+  $('l-auto').href = 'auto.html' + (oib ? '?oib=1' : '');
+
+  function gesture(){ try { return navigator.userActivation ? ('userActivation.isActive=' + navigator.userActivation.isActive) : 'userActivation nedostupné'; } catch(e){ return '?'; } }
+  function wire(id, label){ var el = $(id); el.addEventListener('click', function(){ log('KLIK ' + label + ' | ' + gesture() + ' | href=' + (el.href || '-')); }); }
+  wire('b-ig','Instagram extbrowser (odkaz)'); wire('b-th','Threads barcelona (odkaz)'); wire('b-int','intent bez package (odkaz)'); wire('b-intc','intent Chrome (odkaz)'); wire('b-xs','x-safari (odkaz)');
+
+  $('j-ig').addEventListener('click', function(){ log('KLIK skript location.href instagram://extbrowser | ' + gesture()); location.href = 'instagram://extbrowser/?url=' + encodeURIComponent(ret('ig-js', true)); });
+  $('j-xs').addEventListener('click', function(){ log('KLIK skript window.open x-safari | ' + gesture()); var w = window.open('x-safari-' + ret('xsafari-open', true), '_blank'); log('window.open vrátil: ' + (w ? 'okno' : 'null (zablokováno)')); });
+  $('j-meta').addEventListener('click', function(){ log('KLIK skript vložení <meta refresh> | ' + gesture()); var m = document.createElement('meta'); m.httpEquiv = 'refresh'; m.content = '0;url=instagram://extbrowser/?url=' + encodeURIComponent(ret('meta-js', true)); document.head.appendChild(m); setTimeout(function(){ log('po 1500 ms stránka pořád viditelná → dynamický meta refresh nezabral'); }, 1500); });
+
+  document.addEventListener('visibilitychange', function(){ log('visibilitychange → ' + document.visibilityState); });
+  window.addEventListener('pagehide', function(){ log('pagehide'); });
+  window.addEventListener('pageshow', function(e){ if (e.persisted) log('pageshow (návrat z cache)'); });
+  window.addEventListener('blur', function(){ log('window blur'); });
+
+  function copy(text, btn){ var done = function(ok){ var old = btn.textContent; btn.textContent = ok ? 'Zkopírováno' : 'Nejde kopírovat, označ a zkopíruj ručně'; setTimeout(function(){ btn.textContent = old; }, 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); }); } else { done(false); } }
+  $('copy-url').addEventListener('click', function(){ copy(ret('manual', true), this); });
+  $('copy-res').addEventListener('click', function(){
+    var res = ['Test odkazů GeekBoy ' + new Date().toISOString(), 'UA: ' + ua, 'OS: ' + $('os').textContent, 'Detekce: ' + $('det').textContent, 'Návrat: ' + $('back').textContent, 'Adresa: ' + location.href, 'Referrer: ' + (document.referrer || '-'), '--- záznam ---'].concat(lines).join('\n');
+    $('res').value = res; copy(res, this);
+  });
+
+  log('načteno; ' + (window.InAppSpy ? 'inapp-spy OK' : 'inapp-spy se nenačetl, používám zálohu') + '; ' + gesture());
+})();
+</script>
+</body>
+</html>
