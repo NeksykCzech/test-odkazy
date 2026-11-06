@@ -4,10 +4,10 @@ Pomocná stránka projektu GeekBoy „chytré affiliate odkazy“. Ukáže, jest
 uvnitř aplikace (Instagram, Threads, TikTok, YouTube), nebo v běžném prohlížeči, a nabídne
 tlačítka na všechny známé cesty ven. Nic nesbírá ani neposílá; výsledek se kopíruje ručně.
 
-- Stránka: https://geekboy-cz.github.io/test-odkazy/
-- Automatický pokus při načtení: https://geekboy-cz.github.io/test-odkazy/auto.html
+- Stránka: https://neksykczech.github.io/test-odkazy/
+- Automatický pokus při načtení: https://neksykczech.github.io/test-odkazy/auto.html
 
-Zdroj je ve složce `docs/test-stranka` soukromého repozitáře `geekboy-cz/instagram-odkazy`.
+Zdroj je ve složce `docs/test-stranka` soukromého repozitáře `NeksykCzech/instagram-odkazy`.
 Nová verze se vydá z hlavního repozitáře jedním příkazem:
 
-    git subtree push --prefix=docs/test-stranka https://github.com/geekboy-cz/test-odkazy.git main
+    git subtree push --prefix=docs/test-stranka https://github.com/NeksykCzech/test-odkazy.git main
