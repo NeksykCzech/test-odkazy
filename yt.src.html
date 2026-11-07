@@ -67,18 +67,25 @@ details a{color:var(--accent-text)}
   var intentYT = 'intent://www.youtube.com/watch?v=' + id + '#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url=' + encodeURIComponent(WEB) + ';end';
   var intentAny = 'intent://www.youtube.com/watch?v=' + id + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=' + encodeURIComponent(WEB) + ';end';
   var schemeYT = 'youtube://www.youtube.com/watch?v=' + id;
-  var vnd = 'vnd.youtube://' + id;
-  var primary = isAndroid ? intentYT : (isIOS ? schemeYT : WEB);
+  var vnd = 'vnd.youtube://youtube.com/watch?v=' + id;                 // tohle používá openinyoutube.com (Android i iPhone)
+  var primary = (isAndroid || isIOS) ? vnd : WEB;
   var weak = app === 'tiktok';
+
+  // ?auto=1: přesně to, co dělá openinyoutube.com: bez klepnutí, hned při načtení.
+  // Android: nejdřív schéma, hned potom youtube.com jako záloha; iPhone: jen schéma.
+  if (q.get('auto') === '1') {
+    if (isAndroid) { location.replace(vnd); location.replace(WEB); return; }
+    if (isIOS) { location.replace(vnd); setTimeout(function(){ document.getElementById('app').innerHTML = '<p style="padding:24px 0">Automatický pokus proběhl. Když ještě vidíš tuhle stránku, ' + esc(appName) + ' ho zahodil.</p><a class="btn" href="' + vnd + '">Otevřít v YouTube</a>'; }, 2500); return; }
+  }
 
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var video = '<div class="video"><img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt=""><b id="title">Video GeekBoy</b></div>';
   var steps = '<ol class="steps"><li><i>1</i><span>Klepni na <b>⋯</b> vpravo nahoře</span></li><li><i>2</i><span>Vyber <b>Otevřít v ' + (isIOS ? 'Safari' : 'prohlížeči') + '</b>, YouTube se pak otevře samo</span></li></ol>';
   var arrow = '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/><path d="M6 20l6-6 6 6" opacity=".45"/></svg>';
   var more = '<details><summary>Další cesty (jen pro test)</summary><div>' +
-    (isAndroid ? '<a href="' + intentAny + '">intent bez balíčku (výchozí appka pro youtube.com)</a><a href="' + vnd + '">vnd.youtube://</a><a href="' + schemeYT + '">youtube://</a>' : '') +
-    (isIOS ? '<a href="' + vnd + '">vnd.youtube://</a><a href="' + intentAny + '">intent (na iPhonu nemá fungovat)</a>' : '') +
-    '<a href="' + WEB + '">obyčejný odkaz youtube.com</a></div></details>';
+    (isAndroid ? '<a href="' + intentYT + '">intent s balíčkem YouTube</a><a href="' + intentAny + '">intent bez balíčku (výchozí appka pro youtube.com)</a><a href="' + schemeYT + '">youtube://</a>' : '') +
+    (isIOS ? '<a href="' + schemeYT + '">youtube://</a>' : '') +
+    '<a href="' + WEB + '">obyčejný odkaz youtube.com</a><a href="yt.html?v=' + id + '&amp;auto=1">automaticky při načtení, jako openinyoutube.com</a></div></details>';
   var foot = '<div class="foot">Test: <code>' + esc(appName) + ', ' + (isAndroid ? 'Android' : (isIOS ? 'iOS' : 'jiný systém')) + '</code></div>';
   document.getElementById('app').innerHTML = '<div class="logo">' + LOGO + '</div>' + video +
     '<a class="btn" href="' + primary + '">Otevřít v YouTube</a>' +
