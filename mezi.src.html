@@ -73,10 +73,12 @@ p{margin:0;color:var(--muted);font-size:15px}
   // Úniková adresa podle prostředí. Vždy jen jako odkaz, na který se klepne; nic se nespouští samo.
   function intentUrl(u){ var m = u.match(/^https?:\/\/([^#]*)(#.*)?$/); return 'intent://' + m[1] + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=' + encodeURIComponent(u) + ';end'; }
   var escapeUrl = null;
-  if (isAndroid && app !== 'tiktok') escapeUrl = intentUrl(TARGET);
+  if (isAndroid) escapeUrl = intentUrl(TARGET);                       // i v TikToku jako pokus (7. 11. na Pixelu nic neudělal)
   else if (isIOS && app === 'instagram') escapeUrl = 'instagram://extbrowser/?url=' + encodeURIComponent(TARGET);
   else if (isIOS && app === 'threads') escapeUrl = 'barcelona://extbrowser/?url=' + encodeURIComponent(TARGET);
+  else if (isIOS) escapeUrl = 'x-safari-' + TARGET;                   // TikTok a ostatní na iPhonu: poslední známý pokus
   var canEscape = !!escapeUrl;
+  var weak = app === 'tiktok' || (!app && inApp);                     // tlačítko je jen pokus, návod je hlavní cesta
 
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var what = '<div class="what"><div class="ph"><img src="' + PHOTO + '" alt=""></div><div><b>Apple iPhone 16e 128 GB černý</b></div></div>';
@@ -90,11 +92,12 @@ p{margin:0;color:var(--muted);font-size:15px}
     var band = canEscape
       ? '<div class="band"><b>Otevřít v ' + browser + '</b> kvůli nákupu<a href="' + escapeUrl + '">Otevřít</a></div>'
       : '<div class="band"><b>Otevřít v prohlížeči:</b> ⋯ vpravo nahoře<a href="#" id="copy2">Kopírovat</a></div>';
-    html = band + '<div class="logo">' + LOGO + '</div>' + what + '<a class="btn" href="' + TARGET + '">Pokračovat na Alzu</a>' + (canEscape ? '' : arrow) + foot;
+    var hint = (canEscape && weak) ? '<p>Když tlačítko nic neudělá: klepni na <b>⋯</b> vpravo nahoře a vyber Otevřít v prohlížeči.</p>' : '';
+    html = band + '<div class="logo">' + LOGO + '</div>' + what + '<a class="btn" href="' + TARGET + '">Pokračovat na Alzu</a>' + hint + ((weak || !canEscape) ? arrow : '') + foot;
   } else if (canEscape) {
     html = '<div class="logo">' + LOGO + '</div>' + what + '<h1>Otevřít Alzu v ' + browser + '</h1>' +
       '<a class="btn" href="' + escapeUrl + '">Otevřít v ' + browser + '</a>' +
-      '<p>Když se nic nestane:</p>' + steps + copyBtn + contBtn + foot;
+      '<p>' + (weak ? 'V ' + esc(appName) + ' tlačítko často nezabere. Pak:' : 'Když se nic nestane:') + '</p>' + steps + copyBtn + contBtn + (weak ? arrow : '') + foot;
   } else {
     html = '<div class="logo">' + LOGO + '</div>' + what + '<h1>Otevři odkaz v prohlížeči</h1>' + steps +
       '<p>Nebo si odkaz zkopíruj a vlož do ' + browser + '.</p>' + copyBtn + contBtn + arrow + foot;
